@@ -56,30 +56,34 @@
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var init = function () {
-	    var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+	    var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
 	        var yelp;
-	        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+	        return regeneratorRuntime.wrap(function _callee5$(_context5) {
 	            while (1) {
-	                switch (_context3.prev = _context3.next) {
+	                switch (_context5.prev = _context5.next) {
 	                    case 0:
 	                        yelp = new Yelp();
-	                        _context3.next = 3;
-	                        return yelp.authorize();
+	                        //await yelp.authorize();
+	                        //await yelp.getRestaurants();
+	                        //await yelp.getRestaurantDetails();
+
+	                        _context5.next = 3;
+	                        return yelp.readReviews();
 
 	                    case 3:
-	                        console.log(yelp.access_token);
-	                        yelp.getResturants();
+	                        console.log('hey');
+	                        console.log(yelp.reviews.count);
 
 	                    case 5:
 	                    case 'end':
-	                        return _context3.stop();
+	                        return _context5.stop();
 	                }
 	            }
-	        }, _callee3, this);
+	        }, _callee5, this);
 	    }));
 
 	    return function init() {
-	        return _ref3.apply(this, arguments);
+	        return _ref5.apply(this, arguments);
 	    };
 	}();
 
@@ -90,6 +94,14 @@
 	var _querystring = __webpack_require__(46);
 
 	var _querystring2 = _interopRequireDefault(_querystring);
+
+	var _fs = __webpack_require__(33);
+
+	var _fs2 = _interopRequireDefault(_fs);
+
+	var _readline = __webpack_require__(47);
+
+	var _readline2 = _interopRequireDefault(_readline);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -102,18 +114,69 @@
 	        _classCallCheck(this, Yelp);
 
 	        this.access_token = null;
+	        this.restaurants = null;
+	        this.restaurantDetails = 'hi';
+	        this.reviews = 'hey';
 	    }
 
 	    _createClass(Yelp, [{
-	        key: 'authorize',
+	        key: 'readReviews',
 	        value: function () {
 	            var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-	                var response;
+	                var _this = this;
+
 	                return regeneratorRuntime.wrap(function _callee$(_context) {
 	                    while (1) {
 	                        switch (_context.prev = _context.next) {
 	                            case 0:
-	                                _context.next = 2;
+	                                _context.prev = 0;
+	                                return _context.abrupt('return', new Promise(function (resolve, reject) {
+
+	                                    _this.reviews = [];
+
+	                                    lineReader = _readline2.default.createInterface({
+	                                        input: _fs2.default.createReadStream('review.json')
+	                                    });
+
+	                                    lineReader.on('line', function (review) {
+	                                        _this.reviews.push(review);
+	                                    });
+
+	                                    lineReader.on('close', function () {
+	                                        resolve(_this.reviews);
+	                                    });
+	                                }));
+
+	                            case 4:
+	                                _context.prev = 4;
+	                                _context.t0 = _context['catch'](0);
+
+	                                console.log(_context.t0);
+
+	                            case 7:
+	                            case 'end':
+	                                return _context.stop();
+	                        }
+	                    }
+	                }, _callee, this, [[0, 4]]);
+	            }));
+
+	            function readReviews() {
+	                return _ref.apply(this, arguments);
+	            }
+
+	            return readReviews;
+	        }()
+	    }, {
+	        key: 'authorize',
+	        value: function () {
+	            var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+	                var response;
+	                return regeneratorRuntime.wrap(function _callee2$(_context2) {
+	                    while (1) {
+	                        switch (_context2.prev = _context2.next) {
+	                            case 0:
+	                                _context2.next = 2;
 	                                return (0, _axios2.default)({
 	                                    url: 'https://api.yelp.com/oauth2/token',
 	                                    method: 'post',
@@ -128,51 +191,12 @@
 	                                });
 
 	                            case 2:
-	                                response = _context.sent;
+	                                response = _context2.sent;
 
 
 	                                this.access_token = response.data.access_token;
 
 	                            case 4:
-	                            case 'end':
-	                                return _context.stop();
-	                        }
-	                    }
-	                }, _callee, this);
-	            }));
-
-	            function authorize() {
-	                return _ref.apply(this, arguments);
-	            }
-
-	            return authorize;
-	        }()
-	    }, {
-	        key: 'getResturants',
-	        value: function () {
-	            var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-	                return regeneratorRuntime.wrap(function _callee2$(_context2) {
-	                    while (1) {
-	                        switch (_context2.prev = _context2.next) {
-	                            case 0:
-
-	                                (0, _axios2.default)({
-	                                    url: 'https://api.yelp.com/v3/businesses/search',
-	                                    method: 'get',
-	                                    headers: {
-	                                        'Authorization': 'Bearer ' + this.access_token
-	                                    },
-	                                    params: {
-	                                        latitude: 34.270550,
-	                                        longitude: -118.519401
-	                                    }
-	                                }).then(function (response) {
-	                                    console.log(response.data.businesses[(0, 10)]);
-	                                }).catch(function (err) {
-	                                    console.log(err);
-	                                });
-
-	                            case 1:
 	                            case 'end':
 	                                return _context2.stop();
 	                        }
@@ -180,11 +204,101 @@
 	                }, _callee2, this);
 	            }));
 
-	            function getResturants() {
+	            function authorize() {
 	                return _ref2.apply(this, arguments);
 	            }
 
-	            return getResturants;
+	            return authorize;
+	        }()
+	    }, {
+	        key: 'getRestaurants',
+	        value: function () {
+	            var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+	                var response;
+	                return regeneratorRuntime.wrap(function _callee3$(_context3) {
+	                    while (1) {
+	                        switch (_context3.prev = _context3.next) {
+	                            case 0:
+	                                _context3.next = 2;
+	                                return (0, _axios2.default)({
+	                                    url: 'https://api.yelp.com/v3/businesses/search',
+	                                    method: 'get',
+	                                    headers: {
+	                                        'Authorization': 'Bearer ' + this.access_token
+	                                    },
+	                                    params: {
+	                                        category: 'food',
+	                                        latitude: 34.270550,
+	                                        longitude: -118.519401
+	                                    }
+	                                });
+
+	                            case 2:
+	                                response = _context3.sent;
+
+
+	                                this.restaurants = response.data.businesses;
+
+	                            case 4:
+	                            case 'end':
+	                                return _context3.stop();
+	                        }
+	                    }
+	                }, _callee3, this);
+	            }));
+
+	            function getRestaurants() {
+	                return _ref3.apply(this, arguments);
+	            }
+
+	            return getRestaurants;
+	        }()
+	    }, {
+	        key: 'getRestaurantDetails',
+	        value: function () {
+	            var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+	                var response;
+	                return regeneratorRuntime.wrap(function _callee4$(_context4) {
+	                    while (1) {
+	                        switch (_context4.prev = _context4.next) {
+	                            case 0:
+	                                _context4.prev = 0;
+	                                _context4.next = 3;
+	                                return (0, _axios2.default)({
+	                                    url: 'https://api.yelp.com/v3/businesses/presto-pasta-granada-hills',
+	                                    method: 'get',
+	                                    headers: {
+	                                        'Authorization': 'Bearer ' + this.access_token
+	                                    }
+	                                });
+
+	                            case 3:
+	                                response = _context4.sent;
+
+
+	                                this.restaurantDetails = response.data;
+	                                _context4.next = 10;
+	                                break;
+
+	                            case 7:
+	                                _context4.prev = 7;
+	                                _context4.t0 = _context4['catch'](0);
+
+	                                console.log(_context4.t0);
+
+	                            case 10:
+	                            case 'end':
+	                                return _context4.stop();
+	                        }
+	                    }
+	                }, _callee4, this, [[0, 7]]);
+	            }));
+
+	            function getRestaurantDetails() {
+	                return _ref4.apply(this, arguments);
+	            }
+
+	            return getRestaurantDetails;
 	        }()
 	    }]);
 
@@ -2751,7 +2865,7 @@
 /* 36 */
 /***/ (function(module, exports) {
 
-	module.exports = {"_from":"axios@^0.16.2","_id":"axios@0.16.2","_inBundle":false,"_integrity":"sha1-uk+S8XFn37q0CYN4VFS5rBScPG0=","_location":"/axios","_phantomChildren":{},"_requested":{"type":"range","registry":true,"raw":"axios@^0.16.2","name":"axios","escapedName":"axios","rawSpec":"^0.16.2","saveSpec":null,"fetchSpec":"^0.16.2"},"_requiredBy":["/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.16.2.tgz","_shasum":"ba4f92f17167dfbab40983785454b9ac149c3c6d","_spec":"axios@^0.16.2","_where":"C:\\Users\\Dushan Perera\\Code\\yelp","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/mzabriskie/axios/issues"},"bundleDependencies":false,"dependencies":{"follow-redirects":"^1.2.3","is-buffer":"^1.1.5"},"deprecated":false,"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^2.11.9","es6-promise":"^4.0.5","grunt":"^1.0.1","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.0.0","grunt-contrib-nodeunit":"^1.0.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^19.0.0","grunt-karma":"^2.0.0","grunt-ts":"^6.0.0-beta.3","grunt-webpack":"^1.0.18","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^1.3.0","karma-chrome-launcher":"^2.0.0","karma-coverage":"^1.0.0","karma-firefox-launcher":"^1.0.0","karma-jasmine":"^1.0.2","karma-jasmine-ajax":"^0.1.13","karma-opera-launcher":"^1.0.0","karma-phantomjs-launcher":"^1.0.0","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^1.1.0","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^1.7.0","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","phantomjs-prebuilt":"^2.1.7","sinon":"^1.17.4","typescript":"^2.0.3","url-search-params":"^0.6.1","webpack":"^1.13.1","webpack-dev-server":"^1.14.1"},"homepage":"https://github.com/mzabriskie/axios","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/mzabriskie/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","version":"0.16.2"}
+	module.exports = {"name":"axios","version":"0.16.2","description":"Promise based HTTP client for the browser and node.js","main":"index.js","scripts":{"test":"grunt test","start":"node ./sandbox/server.js","build":"NODE_ENV=production grunt build","preversion":"npm test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json","postversion":"git push && git push --tags","examples":"node ./examples/server.js","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"},"repository":{"type":"git","url":"git+https://github.com/mzabriskie/axios.git"},"keywords":["xhr","http","ajax","promise","node"],"author":{"name":"Matt Zabriskie"},"license":"MIT","bugs":{"url":"https://github.com/mzabriskie/axios/issues"},"homepage":"https://github.com/mzabriskie/axios","devDependencies":{"coveralls":"^2.11.9","es6-promise":"^4.0.5","grunt":"^1.0.1","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.0.0","grunt-contrib-nodeunit":"^1.0.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^19.0.0","grunt-karma":"^2.0.0","grunt-ts":"^6.0.0-beta.3","grunt-webpack":"^1.0.18","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^1.3.0","karma-chrome-launcher":"^2.0.0","karma-coverage":"^1.0.0","karma-firefox-launcher":"^1.0.0","karma-jasmine":"^1.0.2","karma-jasmine-ajax":"^0.1.13","karma-opera-launcher":"^1.0.0","karma-phantomjs-launcher":"^1.0.0","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^1.1.0","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^1.7.0","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","phantomjs-prebuilt":"^2.1.7","sinon":"^1.17.4","webpack":"^1.13.1","webpack-dev-server":"^1.14.1","url-search-params":"^0.6.1","typescript":"^2.0.3"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"typings":"./index.d.ts","dependencies":{"follow-redirects":"^1.2.3","is-buffer":"^1.1.5"},"gitHead":"46e275c407f81c44dd9aad419b6e861d8a936580","_id":"axios@0.16.2","_shasum":"ba4f92f17167dfbab40983785454b9ac149c3c6d","_from":"axios@>=0.16.2 <0.17.0","_npmVersion":"3.10.10","_nodeVersion":"6.10.1","_npmUser":{"name":"nickuraltsev","email":"nick.uraltsev@gmail.com"},"dist":{"shasum":"ba4f92f17167dfbab40983785454b9ac149c3c6d","tarball":"https://registry.npmjs.org/axios/-/axios-0.16.2.tgz"},"maintainers":[{"name":"mzabriskie","email":"mzabriskie@gmail.com"},{"name":"nickuraltsev","email":"nick.uraltsev@gmail.com"}],"_npmOperationalInternal":{"host":"s3://npm-registry-packages","tmp":"tmp/axios-0.16.2.tgz_1496518163672_0.8309127793181688"},"directories":{},"_resolved":"https://registry.npmjs.org/axios/-/axios-0.16.2.tgz","readme":"ERROR: No README data found!"}
 
 /***/ }),
 /* 37 */
@@ -3099,6 +3213,12 @@
 /***/ (function(module, exports) {
 
 	module.exports = require("querystring");
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports) {
+
+	module.exports = require("readline");
 
 /***/ })
 /******/ ]);
