@@ -132,9 +132,8 @@
 
 
 	                                this.access_token = response.data.access_token;
-	                                return _context.abrupt('return', true);
 
-	                            case 5:
+	                            case 4:
 	                            case 'end':
 	                                return _context.stop();
 	                        }

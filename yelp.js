@@ -21,7 +21,6 @@ class Yelp {
         });
 
         this.access_token = response.data.access_token;
-        return true;
     }
 
     async getResturants() {
